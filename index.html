@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Valentine</title>
+  <style>
+    :root {
+      --pink-100: #fde2f0;
+      --pink-200: #f9cfe3;
+      --pink-300: #f4b9d6;
+      --red-500: #e73d5b;
+      --red-600: #d63250;
+      --ink: #3a1f2b;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      font-family: "Playfair Display", "Georgia", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% 10%, #fff5fb 0%, transparent 60%),
+        radial-gradient(900px 500px at 90% 20%, #ffe9f5 0%, transparent 55%),
+        linear-gradient(135deg, var(--pink-100), var(--pink-200));
+    }
+
+    .card {
+      width: min(980px, 94vw);
+      padding: 64px 56px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 20px 60px rgba(143, 50, 86, 0.2);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    h1 {
+      font-size: clamp(36px, 5vw, 56px);
+      margin: 0 0 26px 0;
+      letter-spacing: 0.2px;
+    }
+
+    .sub {
+      font-family: "Cormorant Garamond", "Georgia", serif;
+      margin-top: 8px;
+      opacity: 0.8;
+    }
+
+    .playground {
+      margin: 30px auto 10px auto;
+      width: min(680px, 92%);
+      height: 180px;
+      position: relative;
+    }
+
+    .btn {
+      font-family: "Montserrat", "Arial", sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      border: none;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 150px;
+      height: 56px;
+      padding: 0;
+      font-size: 18px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:active { transform: translateY(1px) scale(0.98); }
+
+    .btn-yes {
+      background: var(--red-500);
+      color: var(--white);
+      box-shadow: 0 10px 20px rgba(231, 61, 91, 0.35);
+      position: absolute;
+      left: 24px;
+      top: 40px;
+    }
+
+    .btn-yes:hover { background: var(--red-600); }
+
+    .btn-no {
+      background: var(--white);
+      color: var(--ink);
+      border: 2px solid #f3a9c5;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      transition: left 0.25s ease, top 0.25s ease, transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 8px 16px rgba(243, 169, 197, 0.35);
+      z-index: 10;
+    }
+
+    .hint {
+      margin: 12px 0 0 0;
+      font-family: "Montserrat", "Arial", sans-serif;
+      font-size: 16px;
+      opacity: 0.7;
+    }
+
+    .hidden { display: none; }
+
+    .love {
+      display: grid;
+      gap: 18px;
+      place-items: center;
+    }
+
+    .love img {
+      width: min(320px, 60vw);
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 16px 30px rgba(231, 61, 91, 0.25);
+      border: 8px solid rgba(255, 255, 255, 0.8);
+      background: var(--pink-100);
+    }
+
+    .btn-back {
+      background: transparent;
+      border: 2px solid #e6a3c0;
+      color: var(--ink);
+      padding: 10px 22px;
+    }
+
+    .sad-card {
+      background: #08080a;
+      color: #f7f2f4;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .sad-card .btn-back {
+      color: #f7f2f4;
+      border-color: rgba(255, 255, 255, 0.35);
+    }
+
+    .sad-card img {
+      width: min(320px, 60vw);
+      height: auto;
+      border-radius: 20px;
+      border: 8px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 16px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    @media (max-width: 520px) {
+      .playground { height: 160px; }
+      .btn-yes, .btn-no { top: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="card" id="question-card">
+    <h1>Hi Elizabeth, would you be my date for Valentine?</h1>
+    <div class="playground" id="playground">
+      <button class="btn btn-yes" id="yes">Yes</button>
+    </div>
+    <p class="hint">Try to catch the No button... if you can.</p>
+  </main>
+
+  <main class="card hidden" id="love-card">
+    <div class="love">
+      <h1>Yay! See you on Valentine.</h1>
+      <img src="love.gif" alt="Animated heart" />
+      <button class="btn btn-back" id="back">Back</button>
+    </div>
+  </main>
+
+  <main class="card sad-card hidden" id="sad-card">
+    <div class="love">
+      <h1>I'm so sad for your leaving, but wish you enjoy your Valentine with others.</h1>
+      <img src="broken.gif" alt="Broken heart" />
+      <button class="btn btn-back" id="back-sad">Back</button>
+    </div>
+  </main>
+
+  <button class="btn btn-no" id="no">No</button>
+
+  <script>
+    const yesBtn = document.getElementById('yes');
+    const noBtn = document.getElementById('no');
+    const playground = document.getElementById('playground');
+    const questionCard = document.getElementById('question-card');
+    const loveCard = document.getElementById('love-card');
+    const sadCard = document.getElementById('sad-card');
+    const backBtn = document.getElementById('back');
+    const backSadBtn = document.getElementById('back-sad');
+    const evadeDistance = 180;
+
+    function positionNoNearYes() {
+      const pad = 12;
+      const yesRect = yesBtn.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+      let x = yesRect.right + 16;
+      let y = yesRect.top;
+
+      const maxX = window.innerWidth - btnRect.width - pad;
+      const maxY = window.innerHeight - btnRect.height - pad;
+
+      x = Math.min(Math.max(pad, x), maxX);
+      y = Math.min(Math.max(pad, y), maxY);
+
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
+    }
+
+    function moveNoButton() {
+      const pad = 12;
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const maxX = window.innerWidth - btnRect.width - pad;
+      const maxY = window.innerHeight - btnRect.height - pad;
+
+      const step = 140; // keep distance but move farther
+      const currentX = btnRect.left;
+      const currentY = btnRect.top;
+      const dx = (Math.random() - 0.5) * step * 2;
+      const dy = (Math.random() - 0.5) * step * 2;
+      let x = currentX + dx;
+      let y = currentY + dy;
+
+      x = Math.min(Math.max(pad, x), maxX);
+      y = Math.min(Math.max(pad, y), maxY);
+
+      // Keep a safe distance from the Yes button
+      const yesRect = yesBtn.getBoundingClientRect();
+      const safeX = yesRect.left + yesRect.width / 2;
+      const safeY = yesRect.top + yesRect.height / 2;
+      const safeZone = 140;
+
+      if (Math.hypot(x - safeX, y - safeY) < safeZone) {
+        x = Math.min(maxX, safeX + safeZone);
+        y = Math.min(maxY, safeY + safeZone / 2);
+      }
+
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
+    }
+
+    function evadeIfClose(e) {
+      const btnRect = noBtn.getBoundingClientRect();
+      const bx = btnRect.left + btnRect.width / 2;
+      const by = btnRect.top + btnRect.height / 2;
+      const distance = Math.hypot(e.clientX - bx, e.clientY - by);
+      if (distance < evadeDistance) moveNoButton();
+    }
+
+    noBtn.addEventListener('pointerenter', moveNoButton);
+    window.addEventListener('pointermove', evadeIfClose);
+    window.addEventListener('resize', () => {
+      positionNoNearYes();
+    });
+
+    yesBtn.addEventListener('click', () => {
+      questionCard.classList.add('hidden');
+      loveCard.classList.remove('hidden');
+      sadCard.classList.add('hidden');
+      noBtn.classList.add('hidden');
+    });
+
+    backBtn.addEventListener('click', () => {
+      loveCard.classList.add('hidden');
+      questionCard.classList.remove('hidden');
+      sadCard.classList.add('hidden');
+      noBtn.classList.remove('hidden');
+      positionNoNearYes();
+    });
+
+    noBtn.addEventListener('click', () => {
+      questionCard.classList.add('hidden');
+      loveCard.classList.add('hidden');
+      sadCard.classList.remove('hidden');
+      noBtn.classList.add('hidden');
+    });
+
+    backSadBtn.addEventListener('click', () => {
+      sadCard.classList.add('hidden');
+      questionCard.classList.remove('hidden');
+      noBtn.classList.remove('hidden');
+      positionNoNearYes();
+    });
+
+    // Keep the No button in its original spot until the user approaches
+    positionNoNearYes();
+  </script>
+</body>
+</html>
