@@ -180,9 +180,8 @@
 
   <main class="card sad-card hidden" id="sad-card">
     <div class="love">
-      <h1>I'm so sad for your leaving, but wish you enjoy your Valentine with others.</h1>
+      <h1>I'm so sorry for your leaving, wish you enjoy your Valentine with others.</h1>
       <img src="broken.gif" alt="Broken heart" />
-      <button class="btn btn-back" id="back-sad">Back</button>
     </div>
   </main>
 
@@ -196,7 +195,6 @@
     const loveCard = document.getElementById('love-card');
     const sadCard = document.getElementById('sad-card');
     const backBtn = document.getElementById('back');
-    const backSadBtn = document.getElementById('back-sad');
     const evadeDistance = 180;
 
     function positionNoNearYes() {
@@ -283,13 +281,6 @@
       loveCard.classList.add('hidden');
       sadCard.classList.remove('hidden');
       noBtn.classList.add('hidden');
-    });
-
-    backSadBtn.addEventListener('click', () => {
-      sadCard.classList.add('hidden');
-      questionCard.classList.remove('hidden');
-      noBtn.classList.remove('hidden');
-      positionNoNearYes();
     });
 
     // Keep the No button in its original spot until the user approaches
