@@ -155,6 +155,22 @@
       box-shadow: 0 16px 30px rgba(0, 0, 0, 0.45);
     }
 
+    .confirm-actions {
+      margin-top: 18px;
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-yes-fly {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
     @media (max-width: 520px) {
       .playground { height: 160px; }
       .btn-yes, .btn-no { top: 60px; }
@@ -178,14 +194,24 @@
     </div>
   </main>
 
+  <main class="card hidden" id="confirm-card">
+    <div class="love">
+      <h1>Are you sure you don't want to date with me on Valentine?</h1>
+      <div class="confirm-actions">
+        <button class="btn btn-no" id="confirm-no">No</button>
+      </div>
+    </div>
+  </main>
+
   <main class="card sad-card hidden" id="sad-card">
     <div class="love">
-      <h1>I'm so sorry for your leaving, wish you enjoy your Valentine with others.</h1>
+      <h1>I'm so sad for your leaving, but wish you enjoy your Valentine with others.</h1>
       <img src="broken.gif" alt="Broken heart" />
     </div>
   </main>
 
   <button class="btn btn-no" id="no">No</button>
+  <button class="btn btn-yes btn-yes-fly hidden" id="confirm-yes">Yes</button>
 
   <script>
     const yesBtn = document.getElementById('yes');
@@ -193,9 +219,15 @@
     const playground = document.getElementById('playground');
     const questionCard = document.getElementById('question-card');
     const loveCard = document.getElementById('love-card');
+    const confirmCard = document.getElementById('confirm-card');
     const sadCard = document.getElementById('sad-card');
     const backBtn = document.getElementById('back');
+    const confirmYesBtn = document.getElementById('confirm-yes');
+    const confirmNoBtn = document.getElementById('confirm-no');
     const evadeDistance = 180;
+    const confirmClicksRequired = 4;
+    const confirmWindowMs = 1000;
+    let noClickTimes = [];
 
     function positionNoNearYes() {
       const pad = 12;
@@ -248,11 +280,39 @@
     }
 
     function evadeIfClose(e) {
+      if (noBtn.classList.contains('hidden') || questionCard.classList.contains('hidden')) return;
       const btnRect = noBtn.getBoundingClientRect();
       const bx = btnRect.left + btnRect.width / 2;
       const by = btnRect.top + btnRect.height / 2;
       const distance = Math.hypot(e.clientX - bx, e.clientY - by);
       if (distance < evadeDistance) moveNoButton();
+    }
+
+    function moveConfirmYes() {
+      const pad = 12;
+      const btnRect = confirmYesBtn.getBoundingClientRect();
+      const maxX = window.innerWidth - btnRect.width - pad;
+      const maxY = window.innerHeight - btnRect.height - pad;
+      const step = 160;
+      const currentX = btnRect.left;
+      const currentY = btnRect.top;
+      const dx = (Math.random() - 0.5) * step * 2;
+      const dy = (Math.random() - 0.5) * step * 2;
+      let x = currentX + dx;
+      let y = currentY + dy;
+      x = Math.min(Math.max(pad, x), maxX);
+      y = Math.min(Math.max(pad, y), maxY);
+      confirmYesBtn.style.left = `${x}px`;
+      confirmYesBtn.style.top = `${y}px`;
+    }
+
+    function evadeConfirmYes(e) {
+      if (confirmYesBtn.classList.contains('hidden') || confirmCard.classList.contains('hidden')) return;
+      const btnRect = confirmYesBtn.getBoundingClientRect();
+      const bx = btnRect.left + btnRect.width / 2;
+      const by = btnRect.top + btnRect.height / 2;
+      const distance = Math.hypot(e.clientX - bx, e.clientY - by);
+      if (distance < 160) moveConfirmYes();
     }
 
     noBtn.addEventListener('pointerenter', moveNoButton);
@@ -264,27 +324,61 @@
     yesBtn.addEventListener('click', () => {
       questionCard.classList.add('hidden');
       loveCard.classList.remove('hidden');
+      confirmCard.classList.add('hidden');
       sadCard.classList.add('hidden');
       noBtn.classList.add('hidden');
+      confirmYesBtn.classList.add('hidden');
     });
 
     backBtn.addEventListener('click', () => {
       loveCard.classList.add('hidden');
       questionCard.classList.remove('hidden');
+      confirmCard.classList.add('hidden');
       sadCard.classList.add('hidden');
       noBtn.classList.remove('hidden');
+      confirmYesBtn.classList.add('hidden');
       positionNoNearYes();
     });
 
-    noBtn.addEventListener('click', () => {
+    function showConfirmPage() {
       questionCard.classList.add('hidden');
       loveCard.classList.add('hidden');
-      sadCard.classList.remove('hidden');
+      confirmCard.classList.remove('hidden');
+      sadCard.classList.add('hidden');
       noBtn.classList.add('hidden');
+      confirmYesBtn.classList.remove('hidden');
+      moveConfirmYes();
+    }
+
+    noBtn.addEventListener('click', () => {
+      const now = Date.now();
+      noClickTimes.push(now);
+      noClickTimes = noClickTimes.filter((t) => now - t <= confirmWindowMs);
+      if (noClickTimes.length >= confirmClicksRequired) {
+        noClickTimes = [];
+        showConfirmPage();
+      }
+    });
+
+    confirmNoBtn.addEventListener('click', () => {
+      confirmCard.classList.add('hidden');
+      questionCard.classList.remove('hidden');
+      noBtn.classList.remove('hidden');
+      confirmYesBtn.classList.add('hidden');
+      noClickTimes = [];
+      positionNoNearYes();
+    });
+
+    confirmYesBtn.addEventListener('click', () => {
+      confirmCard.classList.add('hidden');
+      sadCard.classList.remove('hidden');
+      confirmYesBtn.classList.add('hidden');
     });
 
     // Keep the No button in its original spot until the user approaches
     positionNoNearYes();
+
+    window.addEventListener('pointermove', evadeConfirmYes);
   </script>
 </body>
 </html>
